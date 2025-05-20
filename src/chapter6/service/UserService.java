@@ -127,7 +127,7 @@ public class UserService {
 	    try {
 	        // パスワード暗号化	★ここで
 	    	String userPassword = user.getPassword();
-	    	if(null != userPassword) {
+	    	if("" != userPassword) {
 	    		userPassword = CipherUtil.encrypt(userPassword);
 	    	}
 

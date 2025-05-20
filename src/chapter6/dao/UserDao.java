@@ -200,7 +200,14 @@ public class UserDao {
 	        ps.setString(1, user.getAccount());
 	        ps.setString(2, user.getName());
 	        ps.setString(3, user.getEmail());
-	        ps.setString(4, user.getPassword());
+
+	        // パスワードが空の時の処理
+	        String userPassword = user.getPassword();
+	        if("" == userPassword) {
+	        	User test = select(connection, user.getId());
+	        	userPassword = test.getPassword();
+	        }
+	        ps.setString(4, userPassword);
 	        ps.setString(5, user.getDescription());
 	        ps.setInt(6, user.getId());
 
