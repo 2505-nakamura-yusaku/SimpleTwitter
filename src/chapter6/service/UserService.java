@@ -92,7 +92,7 @@ public class UserService {
 		}
 	}
 
-	public User select(int userId) {
+	public User select(int userId) {		//★
 
 
 	    log.info(new Object(){}.getClass().getEnclosingClass().getName() +
@@ -125,9 +125,13 @@ public class UserService {
 
 	    Connection connection = null;
 	    try {
-	        // パスワード暗号化
-	        String encPassword = CipherUtil.encrypt(user.getPassword());
-	        user.setPassword(encPassword);
+	        // パスワード暗号化	★ここで
+	    	String userPassword = user.getPassword();
+	    	if(null != userPassword) {
+	    		userPassword = CipherUtil.encrypt(userPassword);
+	    	}
+
+	    	user.setPassword(userPassword);
 
 	        connection = getConnection();
 	        new UserDao().update(connection, user);
