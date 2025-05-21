@@ -7,6 +7,8 @@ import java.sql.Connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.lang.StringUtils;
+
 import chapter6.beans.User;
 import chapter6.dao.UserDao;
 import chapter6.logging.InitApplication;
@@ -92,7 +94,7 @@ public class UserService {
 		}
 	}
 
-	public User select(int userId) {		//★
+	public User select(int userId) {
 
 
 	    log.info(new Object(){}.getClass().getEnclosingClass().getName() +
@@ -127,7 +129,7 @@ public class UserService {
 	    try {
 	        //  パスワードが空白でない場合は暗号化
 	    	String userPassword = user.getPassword();
-	    	if("" != userPassword) {
+	    	if(!StringUtils.isBlank(userPassword)) {
 	    		userPassword = CipherUtil.encrypt(userPassword);
 	    	}
 
