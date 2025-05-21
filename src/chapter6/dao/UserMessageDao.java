@@ -17,77 +17,92 @@ import chapter6.logging.InitApplication;
 
 public class UserMessageDao {
 
-    /**
-    * ロガーインスタンスの生成
-    */
-    Logger log = Logger.getLogger("twitter");
+	/**
+	* ロガーインスタンスの生成
+	*/
+	Logger log = Logger.getLogger("twitter");
 
-    /**
-    * デフォルトコンストラクタ
-    * アプリケーションの初期化を実施する。
-    */
-    public UserMessageDao() {
-        InitApplication application = InitApplication.getInstance();
-        application.init();
+	/**
+	* デフォルトコンストラクタ
+	* アプリケーションの初期化を実施する。
+	*/
+	public UserMessageDao() {
+		InitApplication application = InitApplication.getInstance();
+		application.init();
 
-    }
+	}
 
-    public List<UserMessage> select(Connection connection, int num) {
+	public List<UserMessage> select(Connection connection, Integer userId, int num) {
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-        PreparedStatement ps = null;
-        try {
-            StringBuilder sql = new StringBuilder();
-            sql.append("SELECT ");
-            sql.append("    messages.id as id, ");
-            sql.append("    messages.text as text, ");
-            sql.append("    messages.user_id as user_id, ");
-            sql.append("    users.account as account, ");
-            sql.append("    users.name as name, ");
-            sql.append("    messages.created_date as created_date ");
-            sql.append("FROM messages ");
-            sql.append("INNER JOIN users ");
-            sql.append("ON messages.user_id = users.id ");
-            sql.append("ORDER BY created_date DESC limit " + num);
+		PreparedStatement ps = null;
+		try {
+			StringBuilder sql = new StringBuilder();
+			sql.append("SELECT ");
+			sql.append("    messages.id as id, ");
+			sql.append("    messages.text as text, ");
+			sql.append("    messages.user_id as user_id, ");
+			sql.append("    users.account as account, ");
+			sql.append("    users.name as name, ");
+			sql.append("    messages.created_date as created_date ");
+			sql.append("FROM messages ");
+			sql.append("INNER JOIN users ");
+			sql.append("ON messages.user_id = users.id ");
+			sql.append("ORDER BY created_date DESC limit " + num);
 
-            ps = connection.prepareStatement(sql.toString());
+			ps = connection.prepareStatement(sql.toString());
 
-            ResultSet rs = ps.executeQuery();
+			ResultSet rs = ps.executeQuery();
 
-            List<UserMessage> messages = toUserMessages(rs);
-            return messages;
-        } catch (SQLException e) {
-		log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
-            throw new SQLRuntimeException(e);
-        } finally {
-            close(ps);
-        }
-    }
+			List<UserMessage> messages = toUserMessages(rs);
 
-    private List<UserMessage> toUserMessages(ResultSet rs) throws SQLException {
+			if (null != userId) {
+				List<UserMessage> testMessages = new ArrayList<UserMessage>();
+				for (int i = 0; i < messages.size(); i++) {
+					if (userId == messages.get(i).getUserId()) {
+						testMessages.add(messages.get(i));
+					}
+				}
+				return testMessages;
+			}
 
+			return messages;
+		} catch (SQLException e) {
+			log.log(Level.SEVERE, new Object() {
+			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
+			throw new SQLRuntimeException(e);
+		} finally {
+			close(ps);
+		}
+	}
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+	private List<UserMessage> toUserMessages(ResultSet rs) throws SQLException {
 
-        List<UserMessage> messages = new ArrayList<UserMessage>();
-        try {
-            while (rs.next()) {
-                UserMessage message = new UserMessage();
-                message.setId(rs.getInt("id"));
-                message.setText(rs.getString("text"));
-                message.setUserId(rs.getInt("user_id"));
-                message.setAccount(rs.getString("account"));
-                message.setName(rs.getString("name"));
-                message.setCreatedDate(rs.getTimestamp("created_date"));
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-                messages.add(message);
-            }
-            return messages;
-        } finally {
-            close(rs);
-        }
-    }
+		List<UserMessage> messages = new ArrayList<UserMessage>();
+		try {
+			while (rs.next()) {
+				UserMessage message = new UserMessage();
+				message.setId(rs.getInt("id"));
+				message.setText(rs.getString("text"));
+				message.setUserId(rs.getInt("user_id"));
+				message.setAccount(rs.getString("account"));
+				message.setName(rs.getString("name"));
+				message.setCreatedDate(rs.getTimestamp("created_date"));
+
+				messages.add(message);
+			}
+			return messages;
+		} finally {
+			close(rs);
+		}
+	}
 }

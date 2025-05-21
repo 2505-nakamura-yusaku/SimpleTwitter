@@ -34,22 +34,30 @@ public class TopServlet extends HttpServlet {
 	}
 
 	@Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws IOException, ServletException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-        boolean isShowMessageForm = false;
-        User user = (User) request.getSession().getAttribute("loginUser");
-        if (user != null) {
-            isShowMessageForm = true;
-        }
+		boolean isShowMessageForm = false;
+		User user = (User) request.getSession().getAttribute("loginUser");
+		if (user != null) {
+			isShowMessageForm = true;
+		}
 
-        List<UserMessage> messages = new MessageService().select();
+		/*
+		 * String型のuser_idの値をrequest.getParameter("user_id")で
+		 * JSPから受け取るように設定
+		 * MessageServiceのselectに引数としてString型のuser_idを追加
+		 */
+		String userId = request.getParameter("user_id");
+		List<UserMessage> messages = new MessageService().select(userId);
 
-        request.setAttribute("messages", messages);
-        request.setAttribute("isShowMessageForm", isShowMessageForm);
-        request.getRequestDispatcher("/top.jsp").forward(request, response);
-    }
+		request.setAttribute("messages", messages);
+		request.setAttribute("isShowMessageForm", isShowMessageForm);
+		request.getRequestDispatcher("/top.jsp").forward(request, response);
+	}
 }
