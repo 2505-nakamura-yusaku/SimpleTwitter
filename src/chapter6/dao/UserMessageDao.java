@@ -52,24 +52,24 @@ public class UserMessageDao {
 			sql.append("FROM messages ");
 			sql.append("INNER JOIN users ");
 			sql.append("ON messages.user_id = users.id ");
+
+			if (null != userId) {
+				// userIdがnullでないならSQL文追加
+				sql.append("WHERE user_id = ? ");
+			}
+
 			sql.append("ORDER BY created_date DESC limit " + num);
 
 			ps = connection.prepareStatement(sql.toString());
 
+			if (null != userId) {
+				// 追加されたSQL文のバインド変数の設定
+				ps.setInt(1, userId);
+			}
+
 			ResultSet rs = ps.executeQuery();
 
 			List<UserMessage> messages = toUserMessages(rs);
-
-			if (null != userId) {
-				List<UserMessage> testMessages = new ArrayList<UserMessage>();
-				for (int i = 0; i < messages.size(); i++) {
-					if (userId == messages.get(i).getUserId()) {
-						testMessages.add(messages.get(i));
-					}
-				}
-				return testMessages;
-			}
-
 			return messages;
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, new Object() {
