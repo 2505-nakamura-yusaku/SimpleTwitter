@@ -59,6 +59,8 @@ public class SignUpServlet extends HttpServlet {
 		List<String> errorMessages = new ArrayList<String>();
 
 		User user = getUser(request);
+
+		// 登録情報のエラーハンドリング
 		if (!isValid(user, errorMessages)) {
 			request.setAttribute("errorMessages", errorMessages);
 			request.getRequestDispatcher("signup.jsp").forward(request, response);
@@ -112,6 +114,12 @@ public class SignUpServlet extends HttpServlet {
 
 		if (!StringUtils.isEmpty(email) && (50 < email.length())) {
 			errorMessages.add("メールアドレスは50文字以下で入力してください");
+		}
+
+		// アカウント重複時処理
+		User dupulicationUser = new UserService().select(user.getAccount());
+		if(dupulicationUser != null && dupulicationUser.getId() != user.getId()) {
+			errorMessages.add("すでに存在するアカウントです");
 		}
 
 		if (errorMessages.size() != 0) {
