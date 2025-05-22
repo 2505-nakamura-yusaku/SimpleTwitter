@@ -67,22 +67,27 @@ public class UserService {
 	 */
 	public User select(String account) {
 
-	    Connection connection = null;
-	    try {
-	        connection = getConnection();
-	        User user = new UserDao().select(connection, account);
-	        commit(connection);
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	        return user;
-	    } catch (RuntimeException e) {
-	        rollback(connection);
-	        throw e;
-	    } catch (Error e) {
-	        rollback(connection);
-	        throw e;
-	    } finally {
-	        close(connection);
-	    }
+		Connection connection = null;
+		try {
+			connection = getConnection();
+			User user = new UserDao().select(connection, account);
+			commit(connection);
+
+			return user;
+		} catch (RuntimeException e) {
+			rollback(connection);
+			throw e;
+		} catch (Error e) {
+			rollback(connection);
+			throw e;
+		} finally {
+			close(connection);
+		}
 	}
 
 	public User select(String accountOrEmail, String password) {
@@ -119,58 +124,65 @@ public class UserService {
 
 	public User select(int userId) {
 
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	    log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-	    " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		Connection connection = null;
+		try {
+			connection = getConnection();
+			User user = new UserDao().select(connection, userId);
+			commit(connection);
 
-	    Connection connection = null;
-	    try {
-	        connection = getConnection();
-	        User user = new UserDao().select(connection, userId);
-	        commit(connection);
-
-	        return user;
-	    } catch (RuntimeException e) {
-	        rollback(connection);
-		  log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
-	        throw e;
-	    } catch (Error e) {
-	        rollback(connection);
-		  log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
-	        throw e;
-	    } finally {
-	        close(connection);
-	    }
+			return user;
+		} catch (RuntimeException e) {
+			rollback(connection);
+			log.log(Level.SEVERE, new Object() {
+			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
+			throw e;
+		} catch (Error e) {
+			rollback(connection);
+			log.log(Level.SEVERE, new Object() {
+			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
+			throw e;
+		} finally {
+			close(connection);
+		}
 	}
 
 	public void update(User user) {
 
-	    log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-	    " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-	    Connection connection = null;
-	    try {
-	        //  パスワードが空白でない場合は暗号化
-	    	String userPassword = user.getPassword();
-	    	if(!StringUtils.isBlank(userPassword)) {
-	    		userPassword = CipherUtil.encrypt(userPassword);
-	    	}
+		Connection connection = null;
+		try {
+			//  パスワードが空白でない場合は暗号化
+			String userPassword = user.getPassword();
+			if (!StringUtils.isBlank(userPassword)) {
+				userPassword = CipherUtil.encrypt(userPassword);
+			}
 
-	    	user.setPassword(userPassword);
+			user.setPassword(userPassword);
 
-	        connection = getConnection();
-	        new UserDao().update(connection, user);
-	        commit(connection);
-	    } catch (RuntimeException e) {
-	        rollback(connection);
-		  log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
-	        throw e;
-	    } catch (Error e) {
-	        rollback(connection);
-		  log.log(Level.SEVERE, new Object(){}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
-	        throw e;
-	    } finally {
-	        close(connection);
-	    }
+			connection = getConnection();
+			new UserDao().update(connection, user);
+			commit(connection);
+		} catch (RuntimeException e) {
+			rollback(connection);
+			log.log(Level.SEVERE, new Object() {
+			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
+			throw e;
+		} catch (Error e) {
+			rollback(connection);
+			log.log(Level.SEVERE, new Object() {
+			}.getClass().getEnclosingClass().getName() + " : " + e.toString(), e);
+			throw e;
+		} finally {
+			close(connection);
+		}
 	}
 }

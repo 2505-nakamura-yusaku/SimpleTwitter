@@ -107,6 +107,11 @@ public class SignUpServlet extends HttpServlet {
 		} else if (20 < account.length()) {
 			errorMessages.add("アカウント名は20文字以下で入力してください");
 		}
+		// アカウント重複時処理
+		User dupulicationUser = new UserService().select(user.getAccount());
+		if (dupulicationUser != null && dupulicationUser.getId() != user.getId()) {
+			errorMessages.add("すでに存在するアカウントです");
+		}
 
 		if (StringUtils.isEmpty(password)) {
 			errorMessages.add("パスワードを入力してください");
@@ -114,12 +119,6 @@ public class SignUpServlet extends HttpServlet {
 
 		if (!StringUtils.isEmpty(email) && (50 < email.length())) {
 			errorMessages.add("メールアドレスは50文字以下で入力してください");
-		}
-
-		// アカウント重複時処理
-		User dupulicationUser = new UserService().select(user.getAccount());
-		if(dupulicationUser != null && dupulicationUser.getId() != user.getId()) {
-			errorMessages.add("すでに存在するアカウントです");
 		}
 
 		if (errorMessages.size() != 0) {

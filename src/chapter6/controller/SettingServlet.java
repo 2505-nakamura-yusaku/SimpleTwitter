@@ -69,7 +69,6 @@ public class SettingServlet extends HttpServlet {
 
 		User user = getUser(request);
 
-
 		if (isValid(user, errorMessages)) {
 			try {
 				new UserService().update(user);
@@ -126,14 +125,13 @@ public class SettingServlet extends HttpServlet {
 		} else if (20 < account.length()) {
 			errorMessages.add("アカウント名は20文字以下で入力してください");
 		}
-		if (!StringUtils.isEmpty(email) && (50 < email.length())) {
-			errorMessages.add("メールアドレスは50文字以下で入力してください");
-		}
-
 		// アカウント重複時処理
 		User dupulicationUser = new UserService().select(user.getAccount());
 		if (dupulicationUser != null && dupulicationUser.getId() != user.getId()) {
 			errorMessages.add("すでに存在するアカウントです");
+		}
+		if (!StringUtils.isEmpty(email) && (50 < email.length())) {
+			errorMessages.add("メールアドレスは50文字以下で入力してください");
 		}
 
 		if (errorMessages.size() != 0) {
