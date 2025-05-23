@@ -1,7 +1,6 @@
 package chapter6.controller;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -10,8 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import chapter6.beans.User;
-import chapter6.beans.UserMessage;
 import chapter6.logging.InitApplication;
 import chapter6.service.MessageService;
 
@@ -42,25 +39,26 @@ public class EditServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-		boolean isShowMessageForm = false;
-		User user = (User) request.getSession().getAttribute("loginUser");
-		if (user != null) {
-			isShowMessageForm = true;
+
+
+
+		String strMessageId = request.getParameter("editMessageId");
+		int messageid = 0;
+
+		if (strMessageId == null || strMessageId.length() == 0) {
+			// パラメータからstrMessageIdが取得できなかったとき
+			messageid = -1;
+		} else {
+			try {
+				messageid = Integer.parseInt(strMessageId);
+			} catch (NumberFormatException e) {
+				messageid = -1;
+			}
 		}
 
-
-		String editMessage = request.getParameter("editMessage");
-		/*
-		 * String型のuser_idの値をrequest.getParameter("user_id")で
-		 * JSPから受け取るように設定
-		 * MessageServiceのselectに引数としてString型のuser_idを追加
-		 */
-		String userId = request.getParameter("user_id");
-		List<UserMessage> messages = new MessageService().select(userId);
-
-		request.setAttribute("editMessage", editMessage);
-		request.setAttribute("messages", messages);
-		request.setAttribute("isShowMessageForm", isShowMessageForm);
+		// String editMessage = request.getParameter("editMessage"); //削除予定
+		String editMessageText = new MessageService().select(messageid).getText();
+		request.setAttribute("editMessage", editMessageText);
 		request.getRequestDispatcher("/edit.jsp").forward(request, response);
 	}
 }

@@ -82,7 +82,6 @@
 							<form action="edit" method="post">
 								<input type="submit" value="編集">
 								<input type="hidden" name="editMessageId" value="${message.id}">
-								<input type="hidden" name="editMessage" value="${message.text}">
 							</form>
 							<form action="deleteMessage" method="post">
 								<input type="submit" value="削除"> <input type="hidden"
