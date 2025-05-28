@@ -60,4 +60,5 @@ public class TopServlet extends HttpServlet {
 		request.setAttribute("isShowMessageForm", isShowMessageForm);
 		request.getRequestDispatcher("/top.jsp").forward(request, response);
 	}
+
 }
