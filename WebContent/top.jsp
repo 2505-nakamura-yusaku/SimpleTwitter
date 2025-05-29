@@ -79,9 +79,9 @@
 					<c:if test="${  loginUser.id == message.userId }">
 						<div class="form-area">
 							<%--編集・削除クラス--%>
-							<form action="edit" method="post">
-								<input type="submit" value="編集">
-								<input type="hidden" name="editMessageId" value="${message.id}">
+							<form action="edit" method="get">
+								<input type="submit" value="編集"> <input type="hidden"
+									name="editMessageId" value="${message.id}">
 							</form>
 							<form action="deleteMessage" method="post">
 								<input type="submit" value="削除"> <input type="hidden"

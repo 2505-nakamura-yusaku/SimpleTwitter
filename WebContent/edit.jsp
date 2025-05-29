@@ -42,7 +42,7 @@
 			<c:remove var="errorMessages" scope="session" />
 		</c:if>
 		<div class="form-area">
-			<form action="edit" method="post">
+			<form action="edit" method="get">
 				いま、どうしてる？<br />
 				<textarea name="text" cols="100" rows="5" class="tweet-box"><c:out
 						value="${editMessage}" /></textarea>

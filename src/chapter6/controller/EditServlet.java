@@ -38,7 +38,7 @@ public class EditServlet extends HttpServlet {
 	}
 
 	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException, ServletException {
 
 		log.info(new Object() {
@@ -46,63 +46,99 @@ public class EditServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-
-
-
 		String strMessageId = request.getParameter("editMessageId");
-		int messageid = 0;
+		List<String> errorMessages = new ArrayList<String>();
+		HttpSession session = request.getSession();
 
+		// パラメータの整合性チェック
+		if (!isValidMessageId(strMessageId, errorMessages)) {
+			session.setAttribute("errorMessages", errorMessages);
+			response.sendRedirect("./");
+			return;
+		}
+
+		int messageid = -1;
 		if (strMessageId == null || strMessageId.length() == 0) {
-			// パラメータからstrMessageIdが取得できなかったとき→更新ボタン押下時もここ？
-			messageid = -1;
+			// パラメータからstrMessageIdが取得できなかったときの処理
+			// 編集ページで更新ボタンが押下されたときの処理
 
-			HttpSession session = request.getSession();
-	        List<String> errorMessages = new ArrayList<String>();
 			// トップから編集ボタン押下でページ遷移時にはnull、編集後は中身が入る
 			String text = request.getParameter("text");
 			if (!isValid(text, errorMessages)) {
-	            session.setAttribute("errorMessages", errorMessages);
-	            response.sendRedirect("./edit.jsp");
-	            return;
-	        }
+				session.setAttribute("errorMessages", errorMessages);
+				response.sendRedirect("./edit.jsp");
+				return;
+			}
 
-	        Message message = new Message();
-	        message.setText(text);
+			// message更新のために必要な情報を取得
+			Message message = new Message();
+			message.setText(text);
 
-	        User user = (User) session.getAttribute("loginUser");
-	        message.setUserId(user.getId());
+			User user = (User) session.getAttribute("loginUser");
+			message.setUserId(user.getId());
 
-	        new MessageService().insert(message);	//★ここ新しくupdate()を作成して使用
-	        response.sendRedirect("./");
+			int messageId = (int) session.getAttribute("messageId");
+			message.setId(messageId);
+
+			new MessageService().update(message);
+			response.sendRedirect("./");
+			return;
 
 		} else {
-			try {
-				messageid = Integer.parseInt(strMessageId);
-			} catch (NumberFormatException e) {
-				messageid = -1;
-			}
+			messageid = Integer.parseInt(strMessageId);
+			session.setAttribute("messageId", messageid);
 		}
 
-		// トップから編集ボタン押下でページ遷移時には値あり,編集後はnull
 		String editMessageText = new MessageService().select(messageid).getText();
 		request.setAttribute("editMessage", editMessageText);
 		request.getRequestDispatcher("/edit.jsp").forward(request, response);
 	}
 
-    private boolean isValid(String text, List<String> errorMessages) {
+	private boolean isValid(String text, List<String> errorMessages) {
 
-	  log.info(new Object(){}.getClass().getEnclosingClass().getName() +
-        " : " + new Object(){}.getClass().getEnclosingMethod().getName());
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
 
-        if (StringUtils.isBlank(text)) {
-            errorMessages.add("メッセージを入力してください");
-        } else if (140 < text.length()) {
-            errorMessages.add("140文字以下で入力してください");
-        }
+		if (StringUtils.isBlank(text)) {
+			errorMessages.add("メッセージを入力してください");
+		} else if (140 < text.length()) {
+			errorMessages.add("140文字以下で入力してください");
+		}
 
-        if (errorMessages.size() != 0) {
-            return false;
-        }
-        return true;
-    }
+		if (errorMessages.size() != 0) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isValidMessageId(String messageId, List<String> errorMessages) {
+
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
+
+		// メッセージIDに数字以外が含まれているか確認
+		char[] messageIdArray = messageId.toCharArray();
+		for (int i = 0; i < messageId.length(); i++) {
+			if (!Character.isDigit(messageIdArray[i])) {
+				errorMessages.add("不正なパラメータが入力されました");
+				return false;
+			}
+		}
+
+		// メッセージIDが存在しているか確認
+		int intMessageid = Integer.parseInt(messageId);
+		Message checkMessageId = new MessageService().select(intMessageid);
+		if (0 == checkMessageId.getId()) {
+			errorMessages.add("不正なパラメータが入力されました");
+		}
+
+		if (errorMessages.size() != 0) {
+			return false;
+		}
+		return true;
+	}
 }
