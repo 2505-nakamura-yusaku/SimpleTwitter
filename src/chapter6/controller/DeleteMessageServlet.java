@@ -1,6 +1,8 @@
 package chapter6.controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -8,7 +10,11 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
+import org.apache.commons.lang.StringUtils;
+
+import chapter6.beans.Message;
 import chapter6.logging.InitApplication;
 import chapter6.service.MessageService;
 
@@ -39,22 +45,42 @@ public class DeleteMessageServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-		// HttpSession session = request.getSession();　★おそらく不要
 		String strDeleteMessageid = request.getParameter("deleteMessageId");
-		int deleteMessageid = 0;
+		List<String> errorMessages = new ArrayList<String>();
+		HttpSession session = request.getSession();
 
-		if (strDeleteMessageid == null || strDeleteMessageid.length() == 0) {
-			// パラメータからstrDeleteMessageidが取得できなかったとき
-			deleteMessageid = -1;
-		} else {
-			try {
-				deleteMessageid = Integer.parseInt(strDeleteMessageid);
-			} catch (NumberFormatException e) {
-				deleteMessageid = -1;
+		// パラメータの整合性チェック
+		if (!isValidMessageId(strDeleteMessageid, errorMessages)) {
+			session.setAttribute("errorMessages", errorMessages);
+			response.sendRedirect("./");
+			return;
+		}
+
+		int deleteMessageid = Integer.parseInt(strDeleteMessageid);
+		new MessageService().delete(deleteMessageid);
+		response.sendRedirect("./");
+	}
+
+	private boolean isValidMessageId(String messageId, List<String> errorMessages) {
+
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
+
+		// メッセージIDが数字か確認
+		if (StringUtils.isNumeric(messageId)) {
+			// メッセージIDが存在しているか確認
+			int intMessageid = Integer.parseInt(messageId);
+			Message checkMessageId = new MessageService().select(intMessageid);
+			if (0 != checkMessageId.getId()) {
+				// メッセージIDが数字かつ存在していればtrue
+				return true;
 			}
 		}
 
-		new MessageService().delete(deleteMessageid);
-		response.sendRedirect("./");
+		// メッセージIDが不正なケース
+		errorMessages.add("不正なパラメータが入力されました");
+		return false;
 	}
 }

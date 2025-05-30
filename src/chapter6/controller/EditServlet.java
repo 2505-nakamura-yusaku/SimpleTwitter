@@ -57,41 +57,54 @@ public class EditServlet extends HttpServlet {
 			return;
 		}
 
-		int messageid = -1;
-		if (strMessageId == null || strMessageId.length() == 0) {
-			// パラメータからstrMessageIdが取得できなかったときの処理
-			// 編集ページで更新ボタンが押下されたときの処理
-
-			// トップから編集ボタン押下でページ遷移時にはnull、編集後は中身が入る
-			String text = request.getParameter("text");
-			if (!isValid(text, errorMessages)) {
-				session.setAttribute("errorMessages", errorMessages);
-				response.sendRedirect("./edit.jsp");
-				return;
-			}
-
-			// message更新のために必要な情報を取得
-			Message message = new Message();
-			message.setText(text);
-
-			User user = (User) session.getAttribute("loginUser");
-			message.setUserId(user.getId());
-
-			int messageId = (int) session.getAttribute("messageId");
-			message.setId(messageId);
-
-			new MessageService().update(message);
-			response.sendRedirect("./");
-			return;
-
-		} else {
-			messageid = Integer.parseInt(strMessageId);
-			session.setAttribute("messageId", messageid);
-		}
+		int messageid = Integer.parseInt(strMessageId);
+		request.setAttribute("editMessageId", messageid);
 
 		String editMessageText = new MessageService().select(messageid).getText();
 		request.setAttribute("editMessage", editMessageText);
 		request.getRequestDispatcher("/edit.jsp").forward(request, response);
+	}
+
+	@Override
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws IOException, ServletException {
+
+		log.info(new Object() {
+		}.getClass().getEnclosingClass().getName() +
+				" : " + new Object() {
+				}.getClass().getEnclosingMethod().getName());
+
+		List<String> errorMessages = new ArrayList<String>();
+		HttpSession session = request.getSession();
+
+		String text = request.getParameter("text");
+		if (!isValid(text, errorMessages)) {
+			session.setAttribute("editMessage", text);
+			session.setAttribute("errorMessages", errorMessages);
+			response.sendRedirect("./edit.jsp");
+			return;
+		}
+
+		// message更新のために必要な情報を取得
+		Message message = new Message();
+		message.setText(text);
+
+		User user = (User) session.getAttribute("loginUser");
+		message.setUserId(user.getId());
+
+		String strMessageId = request.getParameter("editMessageId");
+		// パラメータの整合性チェック
+		if (!isValidMessageId(strMessageId, errorMessages)) {
+			session.setAttribute("errorMessages", errorMessages);
+			response.sendRedirect("./");
+			return;
+		}
+		int messageid = Integer.parseInt(strMessageId);
+		message.setId(messageid);
+
+		new MessageService().update(message);
+		response.sendRedirect("./");
+
 	}
 
 	private boolean isValid(String text, List<String> errorMessages) {
@@ -120,25 +133,19 @@ public class EditServlet extends HttpServlet {
 				" : " + new Object() {
 				}.getClass().getEnclosingMethod().getName());
 
-		// メッセージIDに数字以外が含まれているか確認
-		char[] messageIdArray = messageId.toCharArray();
-		for (int i = 0; i < messageId.length(); i++) {
-			if (!Character.isDigit(messageIdArray[i])) {
-				errorMessages.add("不正なパラメータが入力されました");
-				return false;
+		// メッセージIDが数字か確認
+		if (StringUtils.isNumeric(messageId)) {
+			// メッセージIDが存在しているか確認
+			int intMessageid = Integer.parseInt(messageId);
+			Message checkMessageId = new MessageService().select(intMessageid);
+			if (0 != checkMessageId.getId()) {
+				// メッセージIDが数字かつ存在していればtrue
+				return true;
 			}
 		}
 
-		// メッセージIDが存在しているか確認
-		int intMessageid = Integer.parseInt(messageId);
-		Message checkMessageId = new MessageService().select(intMessageid);
-		if (0 == checkMessageId.getId()) {
-			errorMessages.add("不正なパラメータが入力されました");
-		}
-
-		if (errorMessages.size() != 0) {
-			return false;
-		}
-		return true;
+		// メッセージIDが不正なケース
+		errorMessages.add("不正なパラメータが入力されました");
+		return false;
 	}
 }

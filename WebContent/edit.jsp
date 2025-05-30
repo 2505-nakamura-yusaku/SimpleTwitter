@@ -42,11 +42,12 @@
 			<c:remove var="errorMessages" scope="session" />
 		</c:if>
 		<div class="form-area">
-			<form action="edit" method="get">
+			<form action="edit" method="post">
 				いま、どうしてる？<br />
-				<textarea name="text" cols="100" rows="5" class="tweet-box"><c:out
-						value="${editMessage}" /></textarea>
-				<br /> <input type="submit" value="更新">（140文字まで）
+				<textarea name="text" cols="100" rows="5" class="tweet-box"><c:out value="${editMessage}" /></textarea>
+				<br />
+				<input type="submit" value="更新">（140文字まで）
+				<input type="hidden" name="editMessageId" value="${editMessageId}">
 			</form>
 		</div>
 		<div class="copyright">Copyright(c)YusakuNakamura</div>

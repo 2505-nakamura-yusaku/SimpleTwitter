@@ -13,17 +13,17 @@
 <body>
 	<div class="main-contents">
 		<div class="header">
-			<c:if test="${ empty loginUser }">
+			<c:if test="${empty loginUser}">
 				<a href="login">ログイン</a>
 				<a href="signup">登録する</a>
 			</c:if>
-			<c:if test="${ not empty loginUser }">
+			<c:if test="${not empty loginUser}">
 				<a href="./">ホーム</a>
 				<a href="setting">設定</a>
 				<a href="logout">ログアウト</a>
 			</c:if>
 		</div>
-		<c:if test="${ not empty loginUser }">
+		<c:if test="${not empty loginUser}">
 			<div class="profile">
 				<div class="name">
 					<h2>
@@ -63,29 +63,27 @@
 			<c:forEach items="${messages}" var="message">
 				<div class="message">
 					<div class="account-name">
-						<span class="account"> <a
-							href="./?user_id=<c:out value="${message.userId}"/> "> <c:out
-									value="${message.account}" />
-						</a>
-						</span> <span class="name"><c:out value="${message.name}" /></span>
+						<span class="account">
+							<a href="./?user_id=<c:out value="${message.userId}"/> ">
+								<c:out value="${message.account}" />
+							</a>
+						</span>
+						<span class="name"><c:out value="${message.name}" /></span>
 					</div>
 					<div class="text">
 						<c:out value="${message.text}" />
 					</div>
 					<div class="date">
-						<fmt:formatDate value="${message.createdDate}"
-							pattern="yyyy/MM/dd HH:mm:ss" />
+						<fmt:formatDate value="${message.createdDate}" pattern="yyyy/MM/dd HH:mm:ss" />
 					</div>
-					<c:if test="${  loginUser.id == message.userId }">
+					<c:if test="${loginUser.id == message.userId}">
 						<div class="form-area">
-							<%--編集・削除クラス--%>
 							<form action="edit" method="get">
-								<input type="submit" value="編集"> <input type="hidden"
-									name="editMessageId" value="${message.id}">
+								<input type="submit" value="編集">
+								<input type="hidden" name="editMessageId" value="${message.id}">
 							</form>
 							<form action="deleteMessage" method="post">
-								<input type="submit" value="削除"> <input type="hidden"
-									name="deleteMessageId" value="${message.id}">
+								<input type="submit" value="削除"> <input type="hidden" name="deleteMessageId" value="${message.id}">
 							</form>
 						</div>
 
