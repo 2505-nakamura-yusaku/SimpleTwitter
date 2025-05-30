@@ -157,16 +157,14 @@ public class MessageDao {
 		try {
 			StringBuilder sql = new StringBuilder();
 			sql.append("UPDATE messages SET ");
-			sql.append("    user_id = ?, ");
 			sql.append("    text = ?, ");
 			sql.append("    updated_date = CURRENT_TIMESTAMP ");
 			sql.append("WHERE id = ?");
 
 			ps = connection.prepareStatement(sql.toString());
 
-			ps.setInt(1, message.getUserId());
-			ps.setString(2, message.getText());
-			ps.setInt(3, message.getId());
+			ps.setString(1, message.getText());
+			ps.setInt(2, message.getId());
 
 			int count = ps.executeUpdate();
 			if (count == 0) {

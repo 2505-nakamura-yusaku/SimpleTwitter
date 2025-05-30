@@ -12,8 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.lang.StringUtils;
-
 import chapter6.beans.Message;
 import chapter6.logging.InitApplication;
 import chapter6.service.MessageService;
@@ -47,40 +45,27 @@ public class DeleteMessageServlet extends HttpServlet {
 
 		String strDeleteMessageid = request.getParameter("deleteMessageId");
 		List<String> errorMessages = new ArrayList<String>();
-		HttpSession session = request.getSession();
+		int intMessageId = -1;
+		Message checkMessage = null;
 
 		// パラメータの整合性チェック
-		if (!isValidMessageId(strDeleteMessageid, errorMessages)) {
+		// メッセージIDが数字か確認
+		if (strDeleteMessageid.matches("^[0-9]{1,}$")) {
+			// メッセージIDが存在しているか確認
+			intMessageId = Integer.parseInt(strDeleteMessageid);
+			checkMessage = new MessageService().select(intMessageId);
+		}
+
+		if (null == checkMessage || intMessageId != checkMessage.getId()) {
+			// メッセージIDが不正ならcheckMessageがnullなのでここで処理終了
+			errorMessages.add("不正なパラメータが入力されました");
+			HttpSession session = request.getSession();
 			session.setAttribute("errorMessages", errorMessages);
 			response.sendRedirect("./");
 			return;
 		}
 
-		int deleteMessageid = Integer.parseInt(strDeleteMessageid);
-		new MessageService().delete(deleteMessageid);
+		new MessageService().delete(intMessageId);
 		response.sendRedirect("./");
-	}
-
-	private boolean isValidMessageId(String messageId, List<String> errorMessages) {
-
-		log.info(new Object() {
-		}.getClass().getEnclosingClass().getName() +
-				" : " + new Object() {
-				}.getClass().getEnclosingMethod().getName());
-
-		// メッセージIDが数字か確認
-		if (StringUtils.isNumeric(messageId)) {
-			// メッセージIDが存在しているか確認
-			int intMessageid = Integer.parseInt(messageId);
-			Message checkMessageId = new MessageService().select(intMessageid);
-			if (0 != checkMessageId.getId()) {
-				// メッセージIDが数字かつ存在していればtrue
-				return true;
-			}
-		}
-
-		// メッセージIDが不正なケース
-		errorMessages.add("不正なパラメータが入力されました");
-		return false;
 	}
 }
