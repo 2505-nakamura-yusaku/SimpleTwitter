@@ -51,10 +51,12 @@ public class EditServlet extends HttpServlet {
 
 		// パラメータの整合性チェック
 		// メッセージIDが数字か確認
-		if (strMessageId.matches("^[0-9]{1,}$")) {
-			// メッセージIDが存在しているか確認
-			int intMessageId = Integer.parseInt(strMessageId);
-			checkMessage = new MessageService().select(intMessageId);
+		if (null != strMessageId) {
+			if (strMessageId.matches("^[0-9]{1,}$")) {
+				// メッセージIDが存在しているか確認
+				int intMessageId = Integer.parseInt(strMessageId);
+				checkMessage = new MessageService().select(intMessageId);
+			}
 		}
 
 		if (null == checkMessage) {

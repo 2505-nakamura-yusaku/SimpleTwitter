@@ -50,10 +50,12 @@ public class DeleteMessageServlet extends HttpServlet {
 
 		// パラメータの整合性チェック
 		// メッセージIDが数字か確認
-		if (strDeleteMessageid.matches("^[0-9]{1,}$")) {
-			// メッセージIDが存在しているか確認
-			intMessageId = Integer.parseInt(strDeleteMessageid);
-			checkMessage = new MessageService().select(intMessageId);
+		if (null != strDeleteMessageid) {
+			if (strDeleteMessageid.matches("^[0-9]{1,}$")) {
+				// メッセージIDが存在しているか確認
+				intMessageId = Integer.parseInt(strDeleteMessageid);
+				checkMessage = new MessageService().select(intMessageId);
+			}
 		}
 
 		if (null == checkMessage) {
