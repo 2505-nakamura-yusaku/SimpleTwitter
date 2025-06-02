@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -46,28 +47,26 @@ public class EditServlet extends HttpServlet {
 
 		String strMessageId = request.getParameter("editMessageId");
 		List<String> errorMessages = new ArrayList<String>();
-		int intMessageId = -1;
 		Message checkMessage = null;
 
 		// パラメータの整合性チェック
 		// メッセージIDが数字か確認
 		if (strMessageId.matches("^[0-9]{1,}$")) {
 			// メッセージIDが存在しているか確認
-			intMessageId = Integer.parseInt(strMessageId);
+			int intMessageId = Integer.parseInt(strMessageId);
 			checkMessage = new MessageService().select(intMessageId);
 		}
 
-		if (null == checkMessage || intMessageId != checkMessage.getId()) {
+		if (null == checkMessage) {
 			// メッセージIDが不正ならcheckMessageがnullなのでここで処理終了
+			HttpSession session = request.getSession();
 			errorMessages.add("不正なパラメータが入力されました");
-			request.setAttribute("errorMessages", errorMessages);
-			request.getRequestDispatcher("/").forward(request, response);
+			session.setAttribute("errorMessages", errorMessages);
+			response.sendRedirect("./");
 			return;
 		}
 
-		request.setAttribute("editMessageId", intMessageId);
-		String editMessageText = new MessageService().select(intMessageId).getText();
-		request.setAttribute("editMessage", editMessageText);
+		request.setAttribute("editMessage", checkMessage);// message型で統一		String editMessageText = new MessageService().select(checkMessage.getId()).getText();
 		request.getRequestDispatcher("/edit.jsp").forward(request, response);
 	}
 
@@ -82,21 +81,22 @@ public class EditServlet extends HttpServlet {
 
 		List<String> errorMessages = new ArrayList<String>();
 
-		String text = request.getParameter("text");
-		if (!isValid(text, errorMessages)) {
-			request.setAttribute("editMessage", text);
-			request.setAttribute("errorMessages", errorMessages);
-			request.getRequestDispatcher("/edit.jsp").forward(request, response);
-			return;
-		}
-
 		// message更新のために必要な情報を取得
 		Message message = new Message();
-		message.setText(text);
 
 		String strMessageId = request.getParameter("editMessageId");
 		int messageid = Integer.parseInt(strMessageId);
 		message.setId(messageid);
+
+		String text = request.getParameter("editMessageText");
+		message.setText(text);
+
+		if (!isValid(text, errorMessages)) {
+			request.setAttribute("editMessage", message);
+			request.setAttribute("errorMessages", errorMessages);
+			request.getRequestDispatcher("/edit.jsp").forward(request, response);
+			return;
+		}
 
 		new MessageService().update(message);
 		response.sendRedirect("./");

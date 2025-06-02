@@ -45,7 +45,7 @@ public class DeleteMessageServlet extends HttpServlet {
 
 		String strDeleteMessageid = request.getParameter("deleteMessageId");
 		List<String> errorMessages = new ArrayList<String>();
-		int intMessageId = -1;
+		int intMessageId = 0;
 		Message checkMessage = null;
 
 		// パラメータの整合性チェック
@@ -56,10 +56,10 @@ public class DeleteMessageServlet extends HttpServlet {
 			checkMessage = new MessageService().select(intMessageId);
 		}
 
-		if (null == checkMessage || intMessageId != checkMessage.getId()) {
+		if (null == checkMessage) {
 			// メッセージIDが不正ならcheckMessageがnullなのでここで処理終了
-			errorMessages.add("不正なパラメータが入力されました");
 			HttpSession session = request.getSession();
+			errorMessages.add("不正なパラメータが入力されました");
 			session.setAttribute("errorMessages", errorMessages);
 			response.sendRedirect("./");
 			return;

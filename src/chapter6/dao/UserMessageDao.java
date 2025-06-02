@@ -70,6 +70,7 @@ public class UserMessageDao {
 			ResultSet rs = ps.executeQuery();
 
 			List<UserMessage> messages = toUserMessages(rs);
+
 			return messages;
 		} catch (SQLException e) {
 			log.log(Level.SEVERE, new Object() {
