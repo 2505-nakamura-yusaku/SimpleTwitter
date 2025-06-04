@@ -20,13 +20,16 @@
 					</c:forEach>
 				</ul>
 			</div>
+		<c:remove var="errorMessages" scope="session" />
 		</c:if>
 
 		<form action="login" method="post">
-			<br /> <label for="accountOrEmail">アカウント名かメールアドレス</label> <input
-				name="accountOrEmail" id="accountOrEmail" /> <br /> <label
-				for="password">パスワード</label> <input name="password" type="password"
-				id="password" /> <br /> <input type="submit" value="ログイン" /> <br />
+			<br />
+			<label for="accountOrEmail">アカウント名かメールアドレス</label>
+			<input	name="accountOrEmail" id="accountOrEmail" /><br />
+			<label for="password">パスワード</label>
+			<input name="password" type="password" id="password" /><br />
+			<input type="submit" value="ログイン" /><br />
 			<a href="./">戻る</a>
 		</form>
 

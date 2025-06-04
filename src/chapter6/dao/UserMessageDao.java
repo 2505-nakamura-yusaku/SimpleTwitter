@@ -32,7 +32,7 @@ public class UserMessageDao {
 
 	}
 
-	public List<UserMessage> select(Connection connection, Integer userId, int num) {
+	public List<UserMessage> select(Connection connection, Integer userId, String start, String end, int num) {
 
 		log.info(new Object() {
 		}.getClass().getEnclosingClass().getName() +
@@ -55,16 +55,22 @@ public class UserMessageDao {
 
 			if (null != userId) {
 				// userIdがnullでないならSQL文追加
-				sql.append("WHERE user_id = ? ");
+				sql.append("WHERE messages.created_date BETWEEN ? AND ? ");
+				sql.append("AND user_id = ? ");
+
+			} else {
+				sql.append("WHERE messages.created_date BETWEEN ? AND ? ");
 			}
 
 			sql.append("ORDER BY created_date DESC limit " + num);
 
 			ps = connection.prepareStatement(sql.toString());
 
+			// SQL文のバインド変数の設定
+			ps.setString(1, start);
+			ps.setString(2, end);
 			if (null != userId) {
-				// 追加されたSQL文のバインド変数の設定
-				ps.setInt(1, userId);
+				ps.setInt(3, userId);
 			}
 
 			ResultSet rs = ps.executeQuery();
