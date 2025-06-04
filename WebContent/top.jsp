@@ -50,7 +50,7 @@
 			<c:remove var="errorMessages" scope="session" />
 		</c:if>
 		<div class="date">
-			<form method="get">
+			<form action="./" method="get">
 				<input type="date" name="start" value="${start}"> ～ <input type="date" name="end" value="${end}">
 				<input type="submit" value="絞込">
 			</form>

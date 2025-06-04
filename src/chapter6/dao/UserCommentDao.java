@@ -56,8 +56,6 @@ public class UserCommentDao {
 
 			ps = connection.prepareStatement(sql.toString());
 
-
-
 			ResultSet rs = ps.executeQuery();
 
 			List<UserComment> comments = toUserComments(rs);

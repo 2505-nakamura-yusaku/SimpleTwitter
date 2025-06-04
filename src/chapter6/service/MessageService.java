@@ -98,7 +98,7 @@ public class MessageService {
 				// 現在日時を取得
 				Date nowDate = new Date();
 				// 表示形式を指定
-				SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+				SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 				stringEnd = sdf1.format(nowDate);
 			}
 

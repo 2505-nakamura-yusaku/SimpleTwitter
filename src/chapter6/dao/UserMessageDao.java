@@ -53,13 +53,10 @@ public class UserMessageDao {
 			sql.append("INNER JOIN users ");
 			sql.append("ON messages.user_id = users.id ");
 
+			sql.append("WHERE messages.created_date BETWEEN ? AND ? ");
 			if (null != userId) {
 				// userIdがnullでないならSQL文追加
-				sql.append("WHERE messages.created_date BETWEEN ? AND ? ");
 				sql.append("AND user_id = ? ");
-
-			} else {
-				sql.append("WHERE messages.created_date BETWEEN ? AND ? ");
 			}
 
 			sql.append("ORDER BY created_date DESC limit " + num);
